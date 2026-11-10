@@ -52,14 +52,14 @@ export function DriverTracker({ active, every = 5000 }: { active: boolean; every
   }, [active, every]);
 
   return (
-    <div className="rounded-xl bg-slate-900 p-5 text-white">
+    <div className="rounded-xl bg-slate-900 p-5 text-slate-50">
       <div className="text-lg font-semibold">{status}</div>
       {last && (
         <div className="mt-2 font-mono text-sm text-slate-300">
           {last.lat.toFixed(5)}, {last.lng.toFixed(5)} · ±{last.acc} m · {last.at}
         </div>
       )}
-      <div className="mt-1 text-xs text-slate-400">Updates sent: {sent}</div>
+      <div className="mt-1 text-xs text-slate-300">Updates sent: {sent}</div>
     </div>
   );
 }

@@ -87,7 +87,7 @@ export function LiveMap({ child, interval = 5000 }: { child?: string; interval?:
     }
     for (const stops of byRoute.values()) Lf.polyline(stops.map((s) => [s.lat, s.lng]), { color: "#94a3b8", dashArray: "6 6", weight: 3 }).addTo(g);
     for (const v of data.vehicles) {
-      if (v.trail.length > 1) Lf.polyline(v.trail, { color: "#4f46e5", weight: 4, opacity: 0.6 }).addTo(g);
+      if (v.trail.length > 1) Lf.polyline(v.trail, { color: "var(--map-trail)", weight: 4, opacity: 0.6 }).addTo(g);
       if (v.lat == null || v.lng == null) continue;
       bounds.push([v.lat, v.lng]);
       Lf.marker([v.lat, v.lng], {

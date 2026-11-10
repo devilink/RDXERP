@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { loginAction } from "@/app/actions/auth";
 import { ActionForm, Submit } from "@/components/action-form";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export default async function LoginPage() {
   const user = await getCurrentUser();
@@ -9,7 +10,8 @@ export default async function LoginPage() {
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-gradient-to-br from-indigo-600 via-indigo-500 to-sky-500 p-4">
-      <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-2xl">
+      <div className="fixed right-4 top-4"><ThemeToggle /></div>
+      <div className="w-full max-w-md rounded-2xl bg-surface p-8 shadow-2xl">
         <div className="mb-6 text-center">
           <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-600 text-2xl text-white">🎓</div>
           <h1 className="text-2xl font-semibold">Radix School ERP</h1>

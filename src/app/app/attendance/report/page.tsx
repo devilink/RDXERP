@@ -82,7 +82,7 @@ export default async function AttendanceReport({ searchParams }: PageProps<"/app
                   const p = pct(present, s.attendance.length);
                   return (
                     <tr key={s.id} className="border-t border-slate-100">
-                      <td className="sticky left-0 whitespace-nowrap bg-white px-2 py-1.5">
+                      <td className="sticky left-0 whitespace-nowrap bg-surface px-2 py-1.5">
                         <Link href={`/app/students/${s.id}`} className="hover:underline">{s.rollNo}. {s.firstName} {s.lastName}</Link>
                       </td>
                       {days.map((d) => {

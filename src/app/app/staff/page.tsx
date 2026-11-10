@@ -62,7 +62,7 @@ export default async function StaffPage() {
                   {u && (
                     <ActionForm action={resetStaffPassword}>
                       <input type="hidden" name="id" value={s.id} />
-                      <Submit className="text-xs text-indigo-600 hover:underline" pendingText="…">Reset password</Submit>
+                      <Submit className="text-xs text-indigo-600 hover:underline dark:text-indigo-400" pendingText="…">Reset password</Submit>
                     </ActionForm>
                   )}
                 </td>

@@ -2,8 +2,9 @@
 
 import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser, startViewingSchool, stopViewingSchool } from "@/lib/auth";
 import { DEFAULT_GRADES } from "@/lib/constants";
 import { failed, num, optStr, randomPassword, str, type ActionState } from "@/lib/utils";
 
@@ -14,6 +15,21 @@ async function guard() {
 }
 
 const PLANS = ["BASIC", "STANDARD", "PREMIUM"];
+
+/** Open a school's portal as its admin, without needing the school's login. */
+export async function enterSchool(fd: FormData) {
+  await guard();
+  const school = await prisma.school.findUnique({ where: { id: str(fd, "id") }, select: { id: true } });
+  if (!school) throw new Error("School not found");
+  await startViewingSchool(school.id);
+  redirect("/app");
+}
+
+export async function exitSchool() {
+  await guard();
+  await stopViewingSchool();
+  redirect("/super");
+}
 
 /** Onboard a new school with its first admin login. */
 export async function createSchool(_: ActionState, fd: FormData): Promise<ActionState> {

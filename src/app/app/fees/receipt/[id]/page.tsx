@@ -20,7 +20,7 @@ export default async function Receipt({ params }: PageProps<"/app/fees/receipt/[
       <div className="no-print mb-4 flex justify-end"><PrintButton label="Print receipt" /></div>
       <div className="card p-8">
         <div className="border-b pb-4 text-center">
-          <h1 className="text-xl font-bold" style={{ color: "var(--brand)" }}>{school.name}</h1>
+          <h1 className="text-brand text-xl font-bold">{school.name}</h1>
           <p className="text-xs text-slate-500">{school.address} {school.phone ? `· ${school.phone}` : ""}</p>
           <p className="mt-2 font-semibold uppercase tracking-wide">Fee Receipt</p>
         </div>

@@ -33,33 +33,41 @@ model School {
   maxStudents  Int      @default(1000)
   createdAt    DateTime @default(now())
 
-  users         User[]
-  academicYears AcademicYear[]
-  classes       Class[]
-  sections      Section[]
-  subjects      Subject[]
-  classSubjects ClassSubject[]
-  staff         Staff[]
-  guardians     Guardian[]
-  students      Student[]
-  attendance    Attendance[]
-  exams         Exam[]
-  examSchedules ExamSchedule[]
-  marks         Mark[]
-  gradeScales   GradeScale[]
-  timetable     TimetableSlot[]
-  notices       Notice[]
-  feeStructures FeeStructure[]
-  invoices      FeeInvoice[]
-  payments      FeePayment[]
-  routes        BusRoute[]
-  stops         BusStop[]
-  vehicles      Vehicle[]
-  pings         LocationPing[]
-  homework      Homework[]
-  events        SchoolEvent[]
-  books         Book[]
-  bookIssues    BookIssue[]
+  users          User[]
+  academicYears  AcademicYear[]
+  classes        Class[]
+  sections       Section[]
+  subjects       Subject[]
+  classSubjects  ClassSubject[]
+  staff          Staff[]
+  guardians      Guardian[]
+  students       Student[]
+  attendance     Attendance[]
+  exams          Exam[]
+  examSchedules  ExamSchedule[]
+  marks          Mark[]
+  gradeScales    GradeScale[]
+  timetable      TimetableSlot[]
+  notices        Notice[]
+  feeStructures  FeeStructure[]
+  invoices       FeeInvoice[]
+  payments       FeePayment[]
+  routes         BusRoute[]
+  stops          BusStop[]
+  vehicles       Vehicle[]
+  pings          LocationPing[]
+  homework       Homework[]
+  events         SchoolEvent[]
+  books          Book[]
+  bookIssues     BookIssue[]
+  courses        Course[]
+  lessons        Lesson[]
+  lessonProgress LessonProgress[]
+  assignments    Assignment[]
+  submissions    Submission[]
+  quizzes        Quiz[]
+  quizQuestions  QuizQuestion[]
+  quizAttempts   QuizAttempt[]
 }
 
 model User {
@@ -109,11 +117,11 @@ model AcademicYear {
 }
 
 model Class {
-  id            String          @id @default(cuid())
+  id            String         @id @default(cuid())
   schoolId      String
-  school        School          @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  school        School         @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   name          String // "Class 5"
-  order         Int             @default(0)
+  order         Int            @default(0)
   sections      Section[]
   classSubjects ClassSubject[]
   examSchedules ExamSchedule[]
@@ -136,6 +144,7 @@ model Section {
   attendance     Attendance[]
   timetable      TimetableSlot[]
   homework       Homework[]
+  courses        Course[]
 
   @@unique([classId, name])
   @@index([schoolId])
@@ -151,6 +160,7 @@ model Subject {
   examSchedules ExamSchedule[]
   timetable     TimetableSlot[]
   homework      Homework[]
+  courses       Course[]
 
   @@unique([schoolId, name])
 }
@@ -190,6 +200,7 @@ model Staff {
   sectionsLed   Section[]       @relation("ClassTeacher")
   classSubjects ClassSubject[]
   timetable     TimetableSlot[]
+  courses       Course[]
 
   @@unique([schoolId, employeeNo])
 }
@@ -210,32 +221,35 @@ model Guardian {
 }
 
 model Student {
-  id          String       @id @default(cuid())
-  schoolId    String
-  school      School       @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  userId      String?      @unique
-  user        User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
-  admissionNo String
-  rollNo      Int?
-  firstName   String
-  lastName    String
-  gender      String? // M | F | O
-  dob         String?
-  bloodGroup  String?
-  address     String?
-  phone       String?
-  sectionId   String?
-  section     Section?     @relation(fields: [sectionId], references: [id], onDelete: SetNull)
-  guardianId  String?
-  guardian    Guardian?    @relation(fields: [guardianId], references: [id], onDelete: SetNull)
-  busStopId   String?
-  busStop     BusStop?     @relation(fields: [busStopId], references: [id], onDelete: SetNull)
-  status      String       @default("ACTIVE") // ACTIVE | LEFT | GRADUATED
-  admittedOn  String?
-  attendance  Attendance[]
-  marks       Mark[]
-  invoices    FeeInvoice[]
-  bookIssues  BookIssue[]
+  id             String           @id @default(cuid())
+  schoolId       String
+  school         School           @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  userId         String?          @unique
+  user           User?            @relation(fields: [userId], references: [id], onDelete: SetNull)
+  admissionNo    String
+  rollNo         Int?
+  firstName      String
+  lastName       String
+  gender         String? // M | F | O
+  dob            String?
+  bloodGroup     String?
+  address        String?
+  phone          String?
+  sectionId      String?
+  section        Section?         @relation(fields: [sectionId], references: [id], onDelete: SetNull)
+  guardianId     String?
+  guardian       Guardian?        @relation(fields: [guardianId], references: [id], onDelete: SetNull)
+  busStopId      String?
+  busStop        BusStop?         @relation(fields: [busStopId], references: [id], onDelete: SetNull)
+  status         String           @default("ACTIVE") // ACTIVE | LEFT | GRADUATED
+  admittedOn     String?
+  attendance     Attendance[]
+  marks          Mark[]
+  invoices       FeeInvoice[]
+  bookIssues     BookIssue[]
+  lessonProgress LessonProgress[]
+  submissions    Submission[]
+  quizAttempts   QuizAttempt[]
 
   @@unique([schoolId, admissionNo])
   @@index([sectionId])
@@ -319,12 +333,12 @@ model Mark {
 }
 
 model GradeScale {
-  id         String @id @default(cuid())
+  id         String  @id @default(cuid())
   schoolId   String
-  school     School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  school     School  @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   grade      String // "A+"
   minPercent Float
-  gradePoint Float  @default(0)
+  gradePoint Float   @default(0)
   remark     String?
 
   @@index([schoolId])
@@ -399,13 +413,13 @@ model SchoolEvent {
 // ---------------------------------------------------------------- Fees
 
 model FeeStructure {
-  id        String  @id @default(cuid())
-  schoolId  String
-  school    School  @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  classId   String?
-  class     Class?  @relation(fields: [classId], references: [id], onDelete: Cascade)
-  name      String // "Tuition fee - April"
-  amount    Float
+  id       String  @id @default(cuid())
+  schoolId String
+  school   School  @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  classId  String?
+  class    Class?  @relation(fields: [classId], references: [id], onDelete: Cascade)
+  name     String // "Tuition fee - April"
+  amount   Float
 
   @@index([schoolId])
 }
@@ -538,4 +552,141 @@ model BookIssue {
   returnedOn String?
 
   @@index([schoolId])
+}
+
+// ---------------------------------------------------------------- LMS
+
+// A course belongs to one section. Students of that section see it once published.
+model Course {
+  id          String       @id @default(cuid())
+  schoolId    String
+  school      School       @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  sectionId   String
+  section     Section      @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  subjectId   String?
+  subject     Subject?     @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+  teacherId   String?
+  teacher     Staff?       @relation(fields: [teacherId], references: [id], onDelete: SetNull)
+  title       String
+  description String?
+  published   Boolean      @default(false)
+  createdAt   DateTime     @default(now())
+  lessons     Lesson[]
+  assignments Assignment[]
+  quizzes     Quiz[]
+
+  @@index([schoolId, sectionId])
+}
+
+model Lesson {
+  id          String           @id @default(cuid())
+  schoolId    String
+  school      School           @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  courseId    String
+  course      Course           @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  title       String
+  body        String?
+  videoUrl    String?
+  resourceUrl String?
+  order       Int              @default(0)
+  createdAt   DateTime         @default(now())
+  progress    LessonProgress[]
+
+  @@index([schoolId, courseId])
+}
+
+model LessonProgress {
+  id          String   @id @default(cuid())
+  schoolId    String
+  school      School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  lessonId    String
+  lesson      Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  studentId   String
+  student     Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  completedAt DateTime @default(now())
+
+  @@unique([lessonId, studentId])
+  @@index([schoolId, studentId])
+}
+
+model Assignment {
+  id           String       @id @default(cuid())
+  schoolId     String
+  school       School       @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  courseId     String
+  course       Course       @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  title        String
+  instructions String?
+  dueDate      String // YYYY-MM-DD
+  maxMarks     Float        @default(100)
+  createdAt    DateTime     @default(now())
+  submissions  Submission[]
+
+  @@index([schoolId, courseId])
+}
+
+model Submission {
+  id           String     @id @default(cuid())
+  schoolId     String
+  school       School     @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  assignmentId String
+  assignment   Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  studentId    String
+  student      Student    @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  text         String?
+  linkUrl      String?
+  submittedAt  DateTime   @default(now())
+  marks        Float?
+  feedback     String?
+  gradedAt     DateTime?
+
+  @@unique([assignmentId, studentId])
+  @@index([schoolId, studentId])
+}
+
+// Multiple choice, marked by the server. Questions are frozen once published.
+model Quiz {
+  id        String         @id @default(cuid())
+  schoolId  String
+  school    School         @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  courseId  String
+  course    Course         @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  title     String
+  published Boolean        @default(false)
+  createdAt DateTime       @default(now())
+  questions QuizQuestion[]
+  attempts  QuizAttempt[]
+
+  @@index([schoolId, courseId])
+}
+
+model QuizQuestion {
+  id           String   @id @default(cuid())
+  schoolId     String
+  school       School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  quizId       String
+  quiz         Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  prompt       String
+  options      String[]
+  correctIndex Int
+  order        Int      @default(0)
+
+  @@index([schoolId, quizId])
+}
+
+model QuizAttempt {
+  id          String   @id @default(cuid())
+  schoolId    String
+  school      School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  quizId      String
+  quiz        Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  studentId   String
+  student     Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  answers     Int[] // chosen option per question, in question order
+  score       Int
+  total       Int
+  submittedAt DateTime @default(now())
+
+  @@unique([quizId, studentId])
+  @@index([schoolId, studentId])
 }

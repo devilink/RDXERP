@@ -17,27 +17,43 @@ export const ACADEMIC: Role[] = ["ADMIN", "TEACHER"];
 export const FINANCE: Role[] = ["ADMIN", "ACCOUNTANT"];
 export const FAMILY: Role[] = ["STUDENT", "PARENT"];
 
-export type NavItem = { href: string; label: string; icon: string; roles: Role[] };
+export const TONES = ["blue", "teal", "violet", "amber", "pink", "green"] as const;
+export type Tone = (typeof TONES)[number];
+
+/** A stable accent colour for a piece of text, so a card keeps its colour between visits. */
+export const toneFor = (text: string): Tone => TONES[[...text].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7) % TONES.length];
+
+export type NavItem = { href: string; label: string; icon: string; tone: Tone; roles: Role[] };
+
 
 export const NAV: NavItem[] = [
-  { href: "/app", label: "Dashboard", icon: "🏠", roles: ["ADMIN", "ACCOUNTANT", "TEACHER", "STUDENT", "PARENT", "DRIVER"] },
-  { href: "/app/my", label: "My Child / Me", icon: "🎒", roles: ["STUDENT", "PARENT"] },
-  { href: "/app/driver", label: "Trip & GPS", icon: "🛰️", roles: ["DRIVER"] },
-  { href: "/app/students", label: "Students", icon: "🧑‍🎓", roles: ["ADMIN", "TEACHER", "ACCOUNTANT"] },
-  { href: "/app/staff", label: "Staff", icon: "👩‍🏫", roles: ["ADMIN"] },
-  { href: "/app/academics", label: "Classes & Subjects", icon: "🏫", roles: ["ADMIN"] },
-  { href: "/app/attendance", label: "Attendance", icon: "✅", roles: ["ADMIN", "TEACHER"] },
-  { href: "/app/attendance/report", label: "Attendance Report", icon: "📊", roles: ["ADMIN", "TEACHER"] },
-  { href: "/app/exams", label: "Exams & Results", icon: "📝", roles: ["ADMIN", "TEACHER"] },
-  { href: "/app/timetable", label: "Timetable", icon: "🗓️", roles: ["ADMIN", "TEACHER", "STUDENT", "PARENT"] },
-  { href: "/app/homework", label: "Homework", icon: "📚", roles: ["ADMIN", "TEACHER", "STUDENT", "PARENT"] },
-  { href: "/app/fees", label: "Fees", icon: "💰", roles: ["ADMIN", "ACCOUNTANT"] },
-  { href: "/app/transport", label: "Transport", icon: "🚌", roles: ["ADMIN"] },
-  { href: "/app/transport/live", label: "Live Bus Map", icon: "📍", roles: ["ADMIN", "PARENT", "STUDENT"] },
-  { href: "/app/library", label: "Library", icon: "📖", roles: ["ADMIN", "TEACHER"] },
-  { href: "/app/notices", label: "Notices", icon: "📢", roles: ["ADMIN", "ACCOUNTANT", "TEACHER", "STUDENT", "PARENT", "DRIVER"] },
-  { href: "/app/calendar", label: "Calendar", icon: "📅", roles: ["ADMIN", "ACCOUNTANT", "TEACHER", "STUDENT", "PARENT", "DRIVER"] },
-  { href: "/app/settings", label: "Settings", icon: "⚙️", roles: ["ADMIN", "ACCOUNTANT", "TEACHER", "STUDENT", "PARENT", "DRIVER"] },
+  { href: "/app", label: "Dashboard", icon: "🏠", tone: "blue", roles: ["ADMIN", "ACCOUNTANT", "TEACHER", "STUDENT", "PARENT", "DRIVER"] },
+  { href: "/app/my", label: "My Child / Me", icon: "🎒", tone: "violet", roles: ["STUDENT", "PARENT"] },
+  { href: "/app/driver", label: "Trip & GPS", icon: "🛰️", tone: "teal", roles: ["DRIVER"] },
+  { href: "/app/students", label: "Students", icon: "🧑‍🎓", tone: "violet", roles: ["ADMIN", "TEACHER", "ACCOUNTANT"] },
+  { href: "/app/staff", label: "Staff", icon: "👩‍🏫", tone: "pink", roles: ["ADMIN"] },
+  { href: "/app/academics", label: "Classes & Subjects", icon: "🏫", tone: "teal", roles: ["ADMIN"] },
+  { href: "/app/attendance", label: "Attendance", icon: "✅", tone: "green", roles: ["ADMIN", "TEACHER"] },
+  { href: "/app/attendance/report", label: "Attendance Report", icon: "📊", tone: "blue", roles: ["ADMIN", "TEACHER"] },
+  { href: "/app/exams", label: "Exams & Results", icon: "📝", tone: "amber", roles: ["ADMIN", "TEACHER"] },
+  { href: "/app/timetable", label: "Timetable", icon: "🗓️", tone: "violet", roles: ["ADMIN", "TEACHER", "STUDENT", "PARENT"] },
+  { href: "/app/homework", label: "Homework", icon: "📚", tone: "pink", roles: ["ADMIN", "TEACHER", "STUDENT", "PARENT"] },
+  { href: "/app/fees", label: "Fees", icon: "💰", tone: "green", roles: ["ADMIN", "ACCOUNTANT"] },
+  { href: "/app/transport", label: "Transport", icon: "🚌", tone: "teal", roles: ["ADMIN"] },
+  { href: "/app/transport/live", label: "Live Bus Map", icon: "📍", tone: "blue", roles: ["ADMIN", "PARENT", "STUDENT"] },
+  { href: "/app/library", label: "Library", icon: "📖", tone: "amber", roles: ["ADMIN", "TEACHER"] },
+  { href: "/app/notices", label: "Notices", icon: "📢", tone: "pink", roles: ["ADMIN", "ACCOUNTANT", "TEACHER", "STUDENT", "PARENT", "DRIVER"] },
+  { href: "/app/calendar", label: "Calendar", icon: "📅", tone: "violet", roles: ["ADMIN", "ACCOUNTANT", "TEACHER", "STUDENT", "PARENT", "DRIVER"] },
+  { href: "/app/settings", label: "Settings", icon: "⚙️", tone: "blue", roles: ["ADMIN", "ACCOUNTANT", "TEACHER", "STUDENT", "PARENT", "DRIVER"] },
+];
+
+export const LMS_ROLES: Role[] = ["ADMIN", "TEACHER", "STUDENT", "PARENT"];
+
+export const LMS_NAV: NavItem[] = [
+  { href: "/app/lms", label: "Overview", icon: "🏠", tone: "blue", roles: LMS_ROLES },
+  { href: "/app/lms/courses", label: "Courses", icon: "📘", tone: "violet", roles: LMS_ROLES },
+  { href: "/app/lms/assignments", label: "Assignments", icon: "📝", tone: "amber", roles: LMS_ROLES },
+  { href: "/app/lms/quizzes", label: "Quizzes", icon: "❓", tone: "teal", roles: LMS_ROLES },
 ];
 
 export const DAYS = ["", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];

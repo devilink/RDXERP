@@ -53,11 +53,11 @@ export default async function FeesPage({ searchParams }: PageProps<"/app/fees">)
     <div className="space-y-6">
       <PageHeader title="Fees & Accounts" />
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
-        <Stat label="Total billed" value={money(billed)} />
-        <Stat label="Collected" value={money(collected)} hint={`${pct(collected, billed)}%`} />
-        <Stat label="Outstanding" value={money(billed - collected)} />
-        <Stat label="Collected today" value={money(todayPay._sum.amount ?? 0)} />
-        <Stat label="This month" value={money(monthPay._sum.amount ?? 0)} />
+        <Stat label="Total billed" tone="blue" value={money(billed)} />
+        <Stat label="Collected" tone="green" value={money(collected)} hint={`${pct(collected, billed)}%`} />
+        <Stat label="Outstanding" tone="amber" value={money(billed - collected)} />
+        <Stat label="Collected today" tone="teal" value={money(todayPay._sum.amount ?? 0)} />
+        <Stat label="This month" tone="violet" value={money(monthPay._sum.amount ?? 0)} />
       </div>
 
       <div className="flex flex-wrap gap-2">

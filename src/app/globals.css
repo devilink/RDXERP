@@ -1,42 +1,209 @@
 @import "tailwindcss";
 
+/* Screen only, so report cards and receipts always print black on white. */
+@custom-variant dark {
+  @media screen {
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      @slot;
+    }
+  }
+}
+
 @theme inline {
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
+@theme {
+  --color-surface: #ffffff;
+}
+
 :root {
   --brand: #4f46e5;
+  --page: #f6f7fb;
+  --map-trail: #4f46e5;
+
+  --viz-accent: #2a78d6;
+  --viz-accent-track: #cde2fb;
+  --viz-watch-track: #fdeec9;
+  --viz-low-track: #f7dcdc;
+  --viz-money: #1baf7a;
+
+  /* Accent colours: solid marks, readable text, and a soft background tint. */
+  --blue: #2563eb;
+  --blue-ink: #1d4ed8;
+  --blue-soft: #dbeafe;
+  --teal: #0d9488;
+  --teal-ink: #0f766e;
+  --teal-soft: #ccfbf1;
+  --violet: #7c3aed;
+  --violet-ink: #6d28d9;
+  --violet-soft: #ede9fe;
+  --amber: #d97706;
+  --amber-ink: #b45309;
+  --amber-soft: #fef3c7;
+  --pink: #db2777;
+  --pink-ink: #be185d;
+  --pink-soft: #fce7f3;
+  --green: #16a34a;
+  --green-ink: #15803d;
+  --green-soft: #dcfce7;
+
+  --graph-school: #334155;
+  --graph-class: #2a78d6;
+  --graph-section: #eb6834;
+  --graph-subject: #1baf7a;
+  --graph-teacher: #eda100;
+  --graph-route: #e87ba4;
+}
+
+/*
+ * Dark theme. Pages are written against Tailwind's slate scale and status colours,
+ * so the scale itself is remapped here and every utility follows. In dark mode slate-50
+ * is the subtlest fill and slate-900 the strongest text, the same roles as in light mode.
+ * Steps not listed (such as the *-500 fills behind white text) look right on both themes.
+ */
+@media screen {
+  [data-theme="dark"] {
+    color-scheme: dark;
+
+    --page: #05070d;
+    --map-trail: #818cf8;
+    --color-surface: #0c111c;
+
+    --color-slate-50: #131a28;
+    --color-slate-100: #1a2232;
+    --color-slate-200: #232d40;
+    --color-slate-300: #364258;
+    --color-slate-400: #8492a9;
+    --color-slate-500: #9aa8bd;
+    --color-slate-600: #b4c0d1;
+    --color-slate-700: #cbd5e1;
+    --color-slate-800: #e2e8f0;
+    --color-slate-900: #f1f5f9;
+
+    --color-rose-50: #3a1622;
+    --color-rose-100: #4c1d2b;
+    --color-rose-600: #fb7185;
+    --color-rose-700: #fda4af;
+
+    --color-emerald-100: #0f3d2e;
+    --color-emerald-600: #34d399;
+    --color-emerald-700: #6ee7b7;
+    --color-emerald-800: #a7f3d0;
+
+    --color-amber-50: #3a2a0d;
+    --color-amber-100: #453109;
+    --color-amber-600: #fbbf24;
+    --color-amber-800: #fde68a;
+
+    --color-sky-100: #0c3a52;
+    --color-sky-600: #38bdf8;
+    --color-sky-700: #7dd3fc;
+
+    --color-indigo-100: #2b2a63;
+    --color-indigo-700: #a5b4fc;
+
+    --color-blue-50: #16294a;
+    --color-blue-200: #2a4a7f;
+
+    --viz-accent: #3987e5;
+    --viz-accent-track: #0d366b;
+    --viz-watch-track: #4a3a12;
+    --viz-low-track: #4a2023;
+    --viz-money: #199e70;
+
+    --blue: #60a5fa;
+    --blue-ink: #93c5fd;
+    --blue-soft: #12264a;
+    --teal: #2dd4bf;
+    --teal-ink: #5eead4;
+    --teal-soft: #08302d;
+    --violet: #a78bfa;
+    --violet-ink: #c4b5fd;
+    --violet-soft: #241a4d;
+    --amber: #fbbf24;
+    --amber-ink: #fcd34d;
+    --amber-soft: #33240a;
+    --pink: #f472b6;
+    --pink-ink: #f9a8d4;
+    --pink-soft: #3d1330;
+    --green: #4ade80;
+    --green-ink: #86efac;
+    --green-soft: #0e2f1c;
+
+    --graph-school: #cbd5e1;
+    --graph-class: #3987e5;
+    --graph-section: #d95926;
+    --graph-subject: #199e70;
+    --graph-teacher: #c98500;
+    --graph-route: #d55181;
+  }
+
+  /* Borders with no colour class use currentColor, which is glaring on dark. Utilities still win. */
+  @layer base {
+    [data-theme="dark"] *,
+    [data-theme="dark"] ::before,
+    [data-theme="dark"] ::after {
+      border-color: var(--color-slate-200);
+    }
+  }
+
+  [data-theme="dark"] .leaflet-tile {
+    filter: invert(1) hue-rotate(180deg) brightness(0.8) contrast(0.9);
+  }
+  [data-theme="dark"] .leaflet-container {
+    background: var(--page);
+  }
+  [data-theme="dark"] .leaflet-popup-content-wrapper,
+  [data-theme="dark"] .leaflet-popup-tip,
+  [data-theme="dark"] .leaflet-bar a {
+    background: var(--color-surface);
+    color: var(--color-slate-900);
+  }
+  [data-theme="dark"] .leaflet-control-attribution {
+    background: var(--color-surface);
+    color: var(--color-slate-500);
+  }
 }
 
 body {
-  background: #f6f7fb;
-  color: #0f172a;
+  background: var(--page);
+  color: var(--color-slate-900);
 }
 
 @utility btn {
   @apply inline-flex items-center justify-center gap-1.5 rounded-lg px-3.5 py-2 text-sm font-medium transition disabled:opacity-50 cursor-pointer;
 }
 
+/* A school's brand colour is usually too dark to read on the dark surface. */
+@utility text-brand {
+  color: var(--brand);
+  @variant dark {
+    color: color-mix(in oklab, var(--brand) 55%, white);
+  }
+}
+
 @layer components {
   .card {
-    @apply rounded-xl border border-slate-200 bg-white p-5 shadow-sm;
+    @apply rounded-xl border border-slate-200 bg-surface p-5 shadow-sm;
   }
   .btn-primary {
     @apply btn text-white hover:opacity-90;
     background: var(--brand);
   }
   .btn-secondary {
-    @apply btn border border-slate-300 bg-white text-slate-700 hover:bg-slate-50;
+    @apply btn border border-slate-300 bg-surface text-slate-700 hover:bg-slate-50;
   }
+  /* Literal colours: rose-600 is remapped to a light text colour in dark mode. */
   .btn-danger {
-    @apply btn bg-rose-600 text-white hover:bg-rose-700;
+    @apply btn bg-[#e11d48] text-white hover:bg-[#be123c];
   }
   .btn-sm {
     @apply px-2.5 py-1 text-xs;
   }
   .input {
-    @apply w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100;
+    @apply w-full rounded-lg border border-slate-300 bg-surface px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100;
   }
   .label {
     @apply mb-1 block text-xs font-medium text-slate-600;
@@ -57,8 +224,57 @@ body {
     @apply inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium;
   }
   .link {
-    @apply font-medium hover:underline;
-    color: var(--brand);
+    @apply font-medium text-brand hover:underline;
+  }
+  /* Each tone-* class selects one accent colour for itself and its children. */
+  .tone-blue {
+    --tone: var(--blue);
+    --tone-ink: var(--blue-ink);
+    --tone-soft: var(--blue-soft);
+  }
+  .tone-teal {
+    --tone: var(--teal);
+    --tone-ink: var(--teal-ink);
+    --tone-soft: var(--teal-soft);
+  }
+  .tone-violet {
+    --tone: var(--violet);
+    --tone-ink: var(--violet-ink);
+    --tone-soft: var(--violet-soft);
+  }
+  .tone-amber {
+    --tone: var(--amber);
+    --tone-ink: var(--amber-ink);
+    --tone-soft: var(--amber-soft);
+  }
+  .tone-pink {
+    --tone: var(--pink);
+    --tone-ink: var(--pink-ink);
+    --tone-soft: var(--pink-soft);
+  }
+  .tone-green {
+    --tone: var(--green);
+    --tone-ink: var(--green-ink);
+    --tone-soft: var(--green-soft);
+  }
+  .tone-card {
+    border-top-width: 3px;
+    border-top-color: var(--tone);
+    background: linear-gradient(135deg, var(--tone-soft), var(--color-surface) 65%);
+  }
+  .tone-text {
+    color: var(--tone-ink);
+  }
+  .tone-tile {
+    background: var(--tone-soft);
+  }
+  .tone-bar {
+    background: var(--tone);
+  }
+  .btn-tone {
+    @apply btn hover:opacity-80;
+    background: var(--tone-soft);
+    color: var(--tone-ink);
   }
 }
 

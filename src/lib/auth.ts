@@ -8,6 +8,9 @@ import type { Role } from "./constants";
 
 const COOKIE = "erp_session";
 const MAX_AGE = 60 * 60 * 24 * 7; // 7 days
+// Which school the platform owner has opened. Only honoured for a SUPER_ADMIN session.
+const VIEW_COOKIE = "erp_view_school";
+const VIEW_MAX_AGE = 60 * 60 * 8; // 8 hours
 
 function secret() {
   const s = process.env.SESSION_SECRET;
@@ -32,7 +35,23 @@ export async function createSession(userId: string) {
 }
 
 export async function destroySession() {
-  (await cookies()).delete(COOKIE);
+  const jar = await cookies();
+  jar.delete(COOKIE);
+  jar.delete(VIEW_COOKIE);
+}
+
+export async function startViewingSchool(schoolId: string) {
+  (await cookies()).set(VIEW_COOKIE, schoolId, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: VIEW_MAX_AGE,
+  });
+}
+
+export async function stopViewingSchool() {
+  (await cookies()).delete(VIEW_COOKIE);
 }
 
 /** Current user (validated against the DB on every request), or null. */
@@ -54,6 +73,17 @@ export const getCurrentUser = cache(async () => {
 });
 
 export type CurrentUser = NonNullable<Awaited<ReturnType<typeof getCurrentUser>>>;
+export type SchoolUser = CurrentUser & { viewingAsOwner?: boolean };
+
+/** The current user, with the platform owner acting as an admin of the school they opened. */
+export const getSchoolUser = cache(async (): Promise<SchoolUser | null> => {
+  const user = await getCurrentUser();
+  if (user?.role !== "SUPER_ADMIN") return user;
+  const id = (await cookies()).get(VIEW_COOKIE)?.value;
+  const school = id ? await prisma.school.findUnique({ where: { id } }) : null;
+  if (!school) return user;
+  return { ...user, role: "ADMIN", schoolId: school.id, school, viewingAsOwner: true };
+});
 
 /** Require a logged-in super admin. */
 export async function requireSuperAdmin() {
@@ -68,7 +98,7 @@ export async function requireSuperAdmin() {
  * Returns the user, their school, and a tenant-scoped db client.
  */
 export async function requireSchoolUser(roles?: Role[]) {
-  const user = await getCurrentUser();
+  const user = await getSchoolUser();
   if (!user) redirect("/login");
   if (user.role === "SUPER_ADMIN" || !user.schoolId || !user.school) redirect("/super");
   if (roles && !roles.includes(user.role as Role)) redirect("/app?denied=1");
@@ -77,7 +107,7 @@ export async function requireSchoolUser(roles?: Role[]) {
 
 /** Same as requireSchoolUser but for server actions: throws instead of redirecting. */
 export async function actionGuard(roles?: Role[]) {
-  const user = await getCurrentUser();
+  const user = await getSchoolUser();
   if (!user || !user.schoolId || !user.school || user.role === "SUPER_ADMIN") {
     throw new Error("Not authorised");
   }

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth";
+import { getSchoolUser } from "@/lib/auth";
 import { tenantDb } from "@/lib/db";
 import { getFamilyStudents } from "@/lib/family";
 
@@ -9,7 +9,7 @@ import { getFamilyStudents } from "@/lib/family";
  * - Parent / student: only the vehicle(s) on their child's route (optionally ?child=<studentId>).
  */
 export async function GET(req: Request) {
-  const user = await getCurrentUser();
+  const user = await getSchoolUser();
   if (!user || !user.schoolId) return NextResponse.json({ error: "Unauthorised" }, { status: 401 });
   const db = tenantDb(user.schoolId);
   const url = new URL(req.url);

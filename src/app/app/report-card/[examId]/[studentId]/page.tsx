@@ -38,7 +38,7 @@ export default async function ReportCard({ params }: PageProps<"/app/report-card
         <header className="border-b pb-4 text-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           {school.logoUrl && <img src={school.logoUrl} alt="" className="mx-auto mb-2 h-16" />}
-          <h1 className="text-2xl font-bold" style={{ color: "var(--brand)" }}>{school.name}</h1>
+          <h1 className="text-brand text-2xl font-bold">{school.name}</h1>
           {school.address && <p className="text-sm text-slate-500">{school.address}</p>}
           <p className="mt-2 text-lg font-semibold uppercase tracking-wide">Progress Report — {exam.name}</p>
           {exam.academicYear && <p className="text-sm text-slate-500">Academic year {exam.academicYear.name}</p>}

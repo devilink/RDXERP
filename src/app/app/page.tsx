@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { requireSchoolUser } from "@/lib/auth";
-import { Badge, Card, Empty, PageHeader, Stat } from "@/components/ui";
+import { Badge, Card, Empty, PageHeader } from "@/components/ui";
 import { fmtDate, money, pct, today } from "@/lib/utils";
 import { getFamilyStudents } from "@/lib/family";
+import { getDashboardData } from "@/lib/dashboard";
+import { AdminDashboard } from "@/components/dashboard/admin-dashboard";
 
 export default async function Dashboard({ searchParams }: PageProps<"/app">) {
-  const { user, db } = await requireSchoolUser();
+  const { user, school, db } = await requireSchoolUser();
   const sp = await searchParams;
   const role = user.role;
   const t = today();
@@ -22,8 +24,26 @@ export default async function Dashboard({ searchParams }: PageProps<"/app">) {
   return (
     <div>
       {sp.denied && <div className="mb-4 rounded-lg bg-amber-50 p-3 text-sm text-amber-800">You don&apos;t have access to that page.</div>}
-      <PageHeader title={`Welcome, ${user.name.split(" ")[0]}`} subtitle={fmtDate(new Date())} />
-      {role === "ADMIN" || role === "ACCOUNTANT" ? <AdminStats /> : null}
+      {role === "ADMIN" || role === "ACCOUNTANT" ? (
+        <section
+          className="tone-violet mb-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-slate-200 p-6"
+          style={{ background: "linear-gradient(120deg, color-mix(in srgb, var(--brand) 16%, var(--color-surface)), var(--color-surface) 55%, var(--tone-soft))" }}
+        >
+          <div>
+            <p className="text-sm font-medium text-slate-600">{fmtDate(new Date())}</p>
+            <h1 className="mt-1 text-2xl font-semibold tracking-tight">{school.name}</h1>
+            <p className="mt-1 text-sm text-slate-600">{user.viewingAsOwner ? "Here" : `Welcome, ${user.name.split(" ")[0]}. Here`} is how the school is doing.</p>
+          </div>
+          <div className="no-print flex flex-wrap gap-2">
+            {role === "ADMIN" && <Link className="btn-primary" href="/app/attendance">Mark attendance</Link>}
+            <Link className="btn-tone tone-green" href="/app/fees">Collect fees</Link>
+            {role === "ADMIN" && <Link className="btn-tone tone-pink" href="/app/notices">Post notice</Link>}
+          </div>
+        </section>
+      ) : (
+        <PageHeader title={`Welcome, ${user.name.split(" ")[0]}`} subtitle={fmtDate(new Date())} />
+      )}
+      {role === "ADMIN" || role === "ACCOUNTANT" ? <AdminPanel /> : null}
       {role === "TEACHER" ? <TeacherPanel staffUserId={user.id} /> : null}
       {role === "PARENT" || role === "STUDENT" ? <FamilyPanel /> : null}
       {role === "DRIVER" ? (
@@ -72,34 +92,9 @@ export default async function Dashboard({ searchParams }: PageProps<"/app">) {
   );
 }
 
-async function AdminStats() {
-  const { db } = await requireSchoolUser();
-  const t = today();
-  const [students, staff, classes, todayAtt, invoices, payments, vehiclesLive] = await Promise.all([
-    db.student.count({ where: { status: "ACTIVE" } }),
-    db.staff.count({ where: { active: true } }),
-    db.section.count(),
-    db.attendance.groupBy({ by: ["status"], where: { date: t }, _count: true }),
-    db.feeInvoice.aggregate({ _sum: { amount: true, discount: true } }),
-    db.feePayment.aggregate({ _sum: { amount: true } }),
-    db.vehicle.count({ where: { tripActive: true } }),
-  ]);
-  const marked = todayAtt.reduce((a, r) => a + r._count, 0);
-  const present = todayAtt.filter((r) => r.status === "PRESENT" || r.status === "LATE").reduce((a, r) => a + r._count, 0);
-  const billed = (invoices._sum.amount ?? 0) - (invoices._sum.discount ?? 0);
-  const collected = payments._sum.amount ?? 0;
-  return (
-    <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-      <Stat label="Active students" value={students} hint={`${classes} sections`} href="/app/students" />
-      <Stat label="Staff" value={staff} href="/app/staff" />
-      <Stat label="Today's attendance" value={marked ? `${pct(present, marked)}%` : "Not marked"} hint={`${marked} of ${students} marked`} href="/app/attendance" />
-      <Stat label="Buses on trip" value={vehiclesLive} href="/app/transport/live" />
-      <Stat label="Fees billed" value={money(billed)} href="/app/fees" />
-      <Stat label="Fees collected" value={money(collected)} hint={`${pct(collected, billed)}% collected`} href="/app/fees" />
-      <Stat label="Outstanding dues" value={money(Math.max(0, billed - collected))} href="/app/fees?tab=dues" />
-      <Stat label="Exams" value={<Link href="/app/exams" className="link text-base">Manage →</Link>} />
-    </div>
-  );
+async function AdminPanel() {
+  const { db, schoolId } = await requireSchoolUser();
+  return <AdminDashboard data={await getDashboardData(db, schoolId)} />;
 }
 
 async function TeacherPanel({ staffUserId }: { staffUserId: string }) {

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { toneFor, type Tone } from "@/lib/constants";
 import { cls } from "@/lib/utils";
 
 export function PageHeader({ title, subtitle, actions }: { title: string; subtitle?: string; actions?: ReactNode }) {
@@ -19,7 +20,12 @@ export function Card({ title, children, className, actions }: { title?: string; 
     <section className={cls("card", className)}>
       {(title || actions) && (
         <div className="mb-4 flex items-center justify-between gap-2">
-          {title && <h2 className="font-semibold">{title}</h2>}
+          {title && (
+            <h2 className="flex items-center gap-2 font-semibold">
+              <span aria-hidden className={`tone-bar tone-${toneFor(title)} h-4 w-1 rounded-full`} />
+              {title}
+            </h2>
+          )}
           {actions}
         </div>
       )}
@@ -28,10 +34,10 @@ export function Card({ title, children, className, actions }: { title?: string; 
   );
 }
 
-export function Stat({ label, value, hint, href }: { label: string; value: ReactNode; hint?: string; href?: string }) {
+export function Stat({ label, value, hint, href, tone = "blue" }: { label: string; value: ReactNode; hint?: string; href?: string; tone?: Tone }) {
   const body = (
-    <div className="card h-full transition hover:shadow-md">
-      <div className="text-xs font-medium uppercase tracking-wide text-slate-500">{label}</div>
+    <div className={`card tone-card tone-${tone} h-full transition hover:shadow-md`}>
+      <div className="tone-text text-xs font-medium uppercase tracking-wide">{label}</div>
       <div className="mt-2 text-2xl font-semibold">{value}</div>
       {hint && <div className="mt-1 text-xs text-slate-500">{hint}</div>}
     </div>

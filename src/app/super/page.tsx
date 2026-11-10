@@ -2,8 +2,9 @@ import { requireSuperAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { Badge, Card, Field, PageHeader, Stat, Table } from "@/components/ui";
 import { ActionForm, Submit } from "@/components/action-form";
-import { createSchool, resetSchoolAdmin, updateSchoolPlan } from "@/app/actions/super";
+import { createSchool, enterSchool, resetSchoolAdmin, updateSchoolPlan } from "@/app/actions/super";
 import { logoutAction } from "@/app/actions/auth";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { fmtDate } from "@/lib/utils";
 
 const PRICE: Record<string, number> = { BASIC: 15, STANDARD: 25, PREMIUM: 40 }; // per student / month (edit to your pricing)
@@ -20,17 +21,17 @@ export default async function SuperAdminPage() {
 
   return (
     <div className="min-h-screen">
-      <header className="flex items-center justify-between border-b bg-white px-6 py-3">
+      <header className="flex items-center justify-between border-b bg-surface px-6 py-3">
         <div className="flex items-center gap-2 font-semibold"><span className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-white">🎓</span> Radix ERP · Platform console</div>
-        <div className="flex items-center gap-3 text-sm">{me.email}<form action={logoutAction}><button className="btn-secondary btn-sm">Log out</button></form></div>
+        <div className="flex items-center gap-3 text-sm">{me.email}<ThemeToggle /><form action={logoutAction}><button className="btn-secondary btn-sm">Log out</button></form></div>
       </header>
       <main className="mx-auto max-w-7xl space-y-6 p-6">
         <PageHeader title="Schools" subtitle="Onboard schools, manage plans and subscriptions." />
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-          <Stat label="Schools" value={schools.length} hint={`${active.length} active`} />
-          <Stat label="Students (all schools)" value={totalStudents.toLocaleString()} />
-          <Stat label="Est. monthly revenue" value={`₹${mrr.toLocaleString("en-IN")}`} hint="students × plan price" />
-          <Stat label="Suspended" value={schools.length - active.length} />
+          <Stat label="Schools" tone="blue" value={schools.length} hint={`${active.length} active`} />
+          <Stat label="Students (all schools)" tone="violet" value={totalStudents.toLocaleString()} />
+          <Stat label="Est. monthly revenue" tone="green" value={`₹${mrr.toLocaleString("en-IN")}`} hint="students × plan price" />
+          <Stat label="Suspended" tone="pink" value={schools.length - active.length} />
         </div>
 
         <Card title="Onboard a new school">
@@ -50,7 +51,7 @@ export default async function SuperAdminPage() {
         </Card>
 
         <Card>
-          <Table head={["School", "Code", "Since", "Students", "Staff", "Users", "Plan / limit / status", "Admin"]}>
+          <Table head={["School", "Code", "Since", "Students", "Staff", "Users", "Plan / limit / status", "Admin", "Portal"]}>
             {schools.map((s) => (
               <tr key={s.id}>
                 <td><div className="font-medium">{s.name}</div><div className="text-xs text-slate-500">{s.email ?? ""}</div></td>
@@ -72,8 +73,14 @@ export default async function SuperAdminPage() {
                 <td>
                   <ActionForm action={resetSchoolAdmin}>
                     <input type="hidden" name="id" value={s.id} />
-                    <Submit className="text-xs text-indigo-600 hover:underline" pendingText="…">Reset admin password</Submit>
+                    <Submit className="text-xs text-indigo-600 hover:underline dark:text-indigo-400" pendingText="…">Reset admin password</Submit>
                   </ActionForm>
+                </td>
+                <td>
+                  <form action={enterSchool}>
+                    <input type="hidden" name="id" value={s.id} />
+                    <button className="btn-primary btn-sm whitespace-nowrap">Open portal</button>
+                  </form>
                 </td>
               </tr>
             ))}
